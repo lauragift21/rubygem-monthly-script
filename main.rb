@@ -7,21 +7,24 @@ def commits_link_for(repo, date)
     date.end_of_month.iso8601 << "%7D"
 end
 
-puts commits_link_for("rubygems/rubygems.org", Date.parse("2020-05-01"))
+puts commits_link_for("rubygems/rubygems.org", Date.parse("2020-08-01"))
 
 def git_summary(repo, date)
   require "http"
-  changes_link      = commits_link_for(repo, date)
+  changes_link = commits_link_for(repo, date)
   puts "Fetching summary information for #{repo}..."
 
   changes_response  = HTTP.get(changes_link)
   changes_html      = changes_response.body.to_s
   contributor_count = changes_html.match(/([\d,]+)\s+contributors/){|m| m[1].tr(',','').to_i }
-  commit_count      = changes_html.match(/Commits\s+<span\s+class="Counter">\s+([\d,]+)\s+<\/span>/){|m| m[1].tr(',','').to_i }
+  commit_count      = changes_html.match(/Commits\s+<span\s+class="Counter\s">\s+([\d]+)\s+<\/span>/){|m| m[1].tr(',','').to_i }
   files_count       = changes_html.match(/([\d,]+)\s+changed\s+files/){|m| m[1].tr(',','').to_i }
   additions_count   = changes_html.match(/([\d,]+)\s+additions/){|m| m[1].tr(',','').to_i }
   deletions_count   = changes_html.match(/([\d,]+)\s+deletions/){|m| m[1].tr(',','').to_i }
   project = repo.split("/").last.capitalize
+
+  puts('commit count': commit_count)
+  puts('files count': files_count)
 
   # Style options
   # 1. In total, this month 13 authors pushed 149 commits, including 1,668 additions and 306 deletions across 78 files.
@@ -40,4 +43,5 @@ def pluralize(name, count)
   "#{count} #{name}#{count == 1 ? '' : 's'}"
 end
 
-puts git_summary("rubygems/rubygems.org", Date.parse("2020-05-01"))
+puts git_summary("rubygems/rubygems.org", Date.parse("2020-08-01"))
+
