@@ -7,7 +7,7 @@ def commits_link_for(repo, date)
     date.end_of_month.iso8601 << "%7D"
 end
 
-puts commits_link_for("rubygems/rubygems.org", Date.parse("2020-08-01"))
+puts commits_link_for("rubygems/rubygems", Date.parse("2020-09-01"))
 
 def git_summary(repo, date)
   require "http"
@@ -18,12 +18,14 @@ def git_summary(repo, date)
   changes_html      = changes_response.body.to_s
   contributor_count = changes_html.match(/([\d,]+)\s+contributors/){|m| m[1].tr(',','').to_i }
   commit_count      = changes_html.match(/Commits\s+<span\s+class="Counter\s">\s+([\d]+)\s+<\/span>/){|m| m[1].tr(',','').to_i }
+  commit_number     = changes_html.match(/([\d,]+)\s+commits/){|m| m[1].tr(',','').to_i }
   files_count       = changes_html.match(/([\d,]+)\s+changed\s+files/){|m| m[1].tr(',','').to_i }
   additions_count   = changes_html.match(/([\d,]+)\s+additions/){|m| m[1].tr(',','').to_i }
   deletions_count   = changes_html.match(/([\d,]+)\s+deletions/){|m| m[1].tr(',','').to_i }
   project = repo.split("/").last.capitalize
 
   puts('commit count': commit_count)
+  puts('commit number': commit_number)
   puts('files count': files_count)
 
   # Style options
@@ -43,5 +45,5 @@ def pluralize(name, count)
   "#{count} #{name}#{count == 1 ? '' : 's'}"
 end
 
-puts git_summary("rubygems/rubygems.org", Date.parse("2020-08-01"))
+puts git_summary("rubygems/rubygems", Date.parse("2020-09-01"))
 
